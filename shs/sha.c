@@ -10,16 +10,15 @@
 
 const size_t DIGEST_LENGTH = 40;
 
-unsigned int calc_hash(const char* mode, const char* in, size_t size, unsigned char* out) {
+unsigned int calc_hash(EVP_MD *md, const char* in, size_t size, unsigned char* out) {
     unsigned int md_len = -1;
-    const EVP_MD *md = EVP_get_digestbyname(mode);
     if (NULL != md) {
         EVP_MD_CTX mdctx;
-        EVP_MD_CTX_init(&mdctx);
-        EVP_DigestInit_ex(&mdctx, md, NULL);
-        EVP_DigestUpdate(&mdctx, in, size);
-        EVP_DigestFinal_ex(&mdctx, out, &md_len);
-        EVP_MD_CTX_cleanup(&mdctx);
+        FIPS_md_ctx_init(&mdctx);
+        FIPS_digestinit(&mdctx, md);
+        FIPS_digestupdate(&mdctx, in, size);
+        FIPS_digestfinal(&mdctx, out, &md_len);
+        FIPS_md_ctx_cleanup(&mdctx);
     }
     return md_len;
 }
@@ -37,28 +36,29 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    char *alg = "SHA256";
+    EVP_MD *md = NULL;
     bool use_rand = false;
+    int i = 0;
 
-    for (int i = 0; i < argc; i++) {
+    for (i; i < argc; i++) {
         if (strcmp(argv[i], "-sha1") == 0) {
-            alg = "SHA1";
+            md = FIPS_evp_sha1();
             continue;
         }
         if (strcmp(argv[i], "-sha224") == 0) {
-            alg = "SHA224";
+            md = FIPS_evp_sha224();
             continue;
         }
         if (strcmp(argv[i], "-sha256") == 0) {
-            alg = "SHA256";
+            md = FIPS_evp_sha256();
             continue;
         }
         if (strcmp(argv[i], "-sha384") == 0) {
-            alg = "SHA384";
+            md = FIPS_evp_sha384();
             continue;
         }
         if (strcmp(argv[i], "-sha512") == 0) {
-            alg = "SHA512";
+            md = FIPS_evp_sha512();
             continue;
         }
 
@@ -85,6 +85,6 @@ int main(int argc, char *argv[]) {
     OpenSSL_add_all_ciphers();
 
     unsigned char* hash = (unsigned char*) malloc(sizeof(unsigned char) * DIGEST_LENGTH);
-    calc_hash(alg, in, strlen(in), hash);
+    calc_hash(md, in, strlen(in), hash);
     printf("%s", hash);
 }

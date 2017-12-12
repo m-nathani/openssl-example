@@ -1,5 +1,5 @@
-CFLAGS = -I/usr/local/ssl/include -Wall
-LDFLAGS = -L/usr/local/ssl/lib -lcrypto -ldl
+CFLAGS = -I /usr/local/ssl/include -Wall
+LDFLAGS = -L /usr/local/ssl/lib -lcrypto -ldl
 
 all: clean bin/gen-ecdsa-key bin/shs
 
