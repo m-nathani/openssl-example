@@ -10,6 +10,12 @@
 
 const size_t DIGEST_LENGTH = 40;
 
+void print_hex(FILE *out, const char *s) {
+  while(*s)
+    fprintf(out, "%02x", (unsigned char) *s++);
+    fprintf(out, "\n");
+}
+
 unsigned int calc_hash(EVP_MD *md, const char* in, size_t size, unsigned char* out) {
     unsigned int md_len = -1;
     if (NULL != md) {
@@ -86,5 +92,5 @@ int main(int argc, char *argv[]) {
 
     unsigned char* hash = (unsigned char*) malloc(sizeof(unsigned char) * DIGEST_LENGTH);
     calc_hash(md, in, strlen(in), hash);
-    printf("%s", hash);
+    print_hex(stdout, hash);
 }

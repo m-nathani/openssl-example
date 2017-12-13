@@ -1,4 +1,4 @@
-CFLAGS = -g -I /usr/local/ssl/include -Wall
+CFLAGS = -g -I /usr/local/ssl/include
 LDFLAGS = -L /usr/local/ssl/lib -lcrypto -ldl
 
 all: clean
@@ -13,16 +13,25 @@ bin/aes-encdec:
 	@echo "+ $@"
 	@$(CC) aes-encdec/main.c -o $@ $(CFLAGS) $(LDFLAGS)
 
+all: bin/fips-selftest
+bin/fips-selftest:
+	@echo "+ $@"
+	@$(CC) fips-selftest/main.c -o $@ $(CFLAGS) $(LDFLAGS)
+
+all: bin/fips-mode-status
+bin/fips-mode-status:
+	@echo "+ $@"
+	@$(CC) fips-mode-status/main.c -o $@ $(CFLAGS) $(LDFLAGS)
+
+all: bin/fips-zerorize
+bin/fips-zerorize:
+	@echo "+ $@"
+	@$(CC) fips-zerorize/main.c -o $@ $(CFLAGS) $(LDFLAGS)
+
 all: bin/gen-ecdsa-key
 bin/gen-ecdsa-key:
 	@echo "+ $@"
 	@$(CC) gen-ecdsa-key/main.c -o $@ $(CFLAGS) $(LDFLAGS)
-
-SRC=$(wildcard shs/*.c)
-all: bin/shs
-bin/shs: $(SRC)
-	@echo "+ $@"
-	@$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
 all: bin/gen-ecdsa-sig
 bin/gen-ecdsa-sig:
@@ -49,20 +58,10 @@ bin/initialize-fips:
 	@echo "+ $@"
 	@$(CC) initialize-fips/main.c -o $@ $(CFLAGS) $(LDFLAGS)
 
-all: bin/fips-selftest
-bin/fips-selftest:
+all: bin/shs
+bin/shs: $(wildcard shs/*.c)
 	@echo "+ $@"
-	@$(CC) fips-selftest/main.c -o $@ $(CFLAGS) $(LDFLAGS)
-
-all: bin/fips-mode-status
-bin/fips-mode-status:
-	@echo "+ $@"
-	@$(CC) fips-mode-status/main.c -o $@ $(CFLAGS) $(LDFLAGS)
-
-all: bin/fips-zerorize
-bin/fips-zerorize:
-	@echo "+ $@"
-	@$(CC) fips-zerorize/main.c -o $@ $(CFLAGS) $(LDFLAGS)
+	@$(CC) -o $@ $^ $(CFLAGS) $(LDFLAGS)
 
 all: bin/sym-key-gen
 bin/sym-key-gen:
